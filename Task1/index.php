@@ -1,6 +1,5 @@
 <?php
 
-set_error_handler('errorHandlerForExceptions');
 readCsvFile("input.csv", "output.csv");
 /**
  * Read data from excel file
@@ -17,8 +16,8 @@ function readCsvFile($input_file_path, $output_file_path)
             writeToCsvFile($input_file, $output_file_path);
             fclose($input_file);
         }
-    } catch (Exception $file_exception) {
-            echo "<b>". $file_exception->getMessage(). "</b>";
+    } catch (Exception $exception) {
+            echo "<b>". $exception->getMessage(). "</b>";
     }
 }
 
@@ -29,6 +28,7 @@ function readCsvFile($input_file_path, $output_file_path)
  */
 function writeToCsvFile($input_file, $output_file_path)
 {
+    set_error_handler('errorHandlerForExceptions');
     $write_file = fopen($output_file_path, "w+");
     while (($data = fgetcsv($input_file, filesize("input.csv"), ",")) !== false) {
         $match = emailValidate($data[3]);
@@ -39,8 +39,8 @@ function writeToCsvFile($input_file, $output_file_path)
                 if (!fputcsv($write_file, explode(',', $output_data))) {
                     echo "<br> Something went wrong writing data to file";
                 }
-            } catch (Exception $offsetException) {
-                echo $offsetException->getMessage();
+            } catch (Exception $exception) {
+                echo $exception->getMessage();
                 break;
             }
         }
