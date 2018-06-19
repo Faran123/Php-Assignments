@@ -1,5 +1,6 @@
 <?php
 
+set_error_handler('errorHandlerForExceptions');
 readCsvFile("input.csv", "output.csv");
 /**
  * Read data from excel file
@@ -30,12 +31,17 @@ function writeToCsvFile($input_file, $output_file_path)
 {
     $write_file = fopen($output_file_path, "w+");
     while (($data = fgetcsv($input_file, filesize("input.csv"), ",")) !== false) {
-        $match = emailValidation($data[3]);
+        $match = emailValidate($data[3]);
         if ($match) {
-            $output_data = $data[0].",". $data[1]. ",". $data[3].",". $data[2].",";
-            echo $output_data. "<br>";
-            if (!fputcsv($write_file, explode(',', $output_data))) {
-                echo "<br> Something went wrong writing data to file";
+            try {
+                $output_data = $data[0] . "," . $data[1] . "," . $data[3] . "," . $data[2] . ",";
+                echo $output_data. "<br>";
+                if (!fputcsv($write_file, explode(',', $output_data))) {
+                    echo "<br> Something went wrong writing data to file";
+                }
+            } catch (Exception $offsetException) {
+                echo $offsetException->getMessage();
+                break;
             }
         }
     }
@@ -47,8 +53,17 @@ function writeToCsvFile($input_file, $output_file_path)
  * @param string $email
  * @return false|true
  */
-function emailValidation($email)
+function emailValidate($email)
 {
     $match = preg_match("/^([0-9]+[a-z]|[a-z]+[0-9])[a-zA-Z0-9]*@(coeus-solutions.de)$/", $email);
     return $match;
+}
+function errorHandlerForExceptions($severity, $message, $file_name, $line_no)
+{
+    if (error_reporting() == 0) {
+        return;
+    }
+    if (error_reporting() & $severity) {
+        throw new ErrorException($message, 0, $severity, $file_name, $line_no);
+    }
 }
