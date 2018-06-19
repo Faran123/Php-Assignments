@@ -22,7 +22,7 @@ function readCsvFile($path, $outputFilePath)
 /**
  * @param $file
  * @param $path
- */
+ */    
 function writeToCsvFile($file, $path)
 {
     $write_file = fopen($path, "w+");
