@@ -1,6 +1,7 @@
 <?php
 
-error_reporting(E_ALL ^ E_WARNING);//enabling all error reporting but disabling warnings
+//enabling all error reporting but disabling warnings
+error_reporting(E_ALL ^ E_WARNING);
 readCsvFile("input.csv", "output.csv");
 /**
  * Read data from excel file
