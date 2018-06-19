@@ -1,5 +1,6 @@
 <?php
 
+error_reporting(E_ALL ^ E_WARNING);//enabling all error reporting but disabling warnings
 readCsvFile("input.csv", "output.csv");
 /**
  * Read data from excel file
@@ -8,8 +9,8 @@ readCsvFile("input.csv", "output.csv");
  */
 function readCsvFile($input_file_path, $output_file_path)
 {
-    $input_file = fopen($input_file_path, "r");
     try {
+        $input_file = fopen($input_file_path, "r");
         if (file_exists($input_file_path) == false) {
             throw  new Exception("Input file does not exist!");
         } else {
@@ -31,18 +32,18 @@ function writeToCsvFile($input_file, $output_file_path)
     set_error_handler('errorHandlerForExceptions');
     $write_file = fopen($output_file_path, "w+");
     while (($data = fgetcsv($input_file, filesize("input.csv"), ",")) !== false) {
-        $match = emailValidate($data[3]);
-        if ($match) {
-            try {
-                $output_data = $data[0] . "," . $data[1] . "," . $data[3] . "," . $data[2] . ",";
+        try {
+            $match = emailValidate($data[3]);
+            if ($match) {
+                $output_data = $data[0] . "," . $data[1] . "," . $data[2] . "," . $data[3] . ",";
                 echo $output_data. "<br>";
                 if (!fputcsv($write_file, explode(',', $output_data))) {
                     echo "<br> Something went wrong writing data to file";
                 }
-            } catch (Exception $exception) {
-                echo $exception->getMessage();
-                break;
             }
+        } catch (Exception $exception) {
+            echo $exception->getMessage();
+            break;
         }
     }
     fclose($write_file);
