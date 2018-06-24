@@ -24,7 +24,7 @@ try {
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="2;URL=signin.php" />
+    <meta http-equiv="refresh" content="2;URL=signIn.php" />
     <title>User Verification</title>
 </head>
 <body>

@@ -114,7 +114,7 @@ function testInput($data)
         <span><?php echo $message ?></span><br>
         <span id="mismatched"></span>
         <button type="submit" target="self">Sign Up</button><br><br>
-        <a href="signin.php" target="_top">Already have an account?</a><br>
+        <a href="signIn.php" target="_top">Already have an account?</a><br>
     </form>
 
 </body>
