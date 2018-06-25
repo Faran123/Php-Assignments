@@ -5,7 +5,7 @@
 
 include "dbConnection.php";
 $message = "";
-
+$email_status = "Sign Up";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_email = testInput($_POST["user_email"]);
     $password = testInput($_POST["password"]);
@@ -15,10 +15,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 /**
  * This method inserts user details in db and then send call email method
- * @param $connection
- * @param $user_email
- * @param $password
- * @param $activation_code
+ * @param object $connection
+ * @param string $user_email
+ * @param string $password
+ * @param string $activation_code
  * @return string
  */
 function insertData($connection, $user_email, $password, $activation_code)
@@ -34,9 +34,11 @@ function insertData($connection, $user_email, $password, $activation_code)
             }
         } else {
             $connection->close();
+            $email_status = "Processing...";
             $status = sendAnEmail($user_email, $activation_code);
             if ($status) {
                 $message = "An activation link has been shared with you. Kindly check your inbox!";
+                $email_status = "Sign Up";
                 return $message;
             }
         }
@@ -50,8 +52,8 @@ function insertData($connection, $user_email, $password, $activation_code)
 
 /**
  * Send an activation code to user email address
- * @param $user_email
- * @param $activation_code
+ * @param string $user_email
+ * @param string $activation_code
  * @return bool
  */
 function sendAnEmail($user_email, $activation_code)
@@ -74,7 +76,7 @@ function sendAnEmail($user_email, $activation_code)
 
 /**
  * This method performs validation checks on user input
- * @param $data
+ * @param string $data
  * @return string
  */
 function testInput($data)
@@ -92,28 +94,32 @@ function testInput($data)
     <meta charset="UTF-8">
     <title>Authentication System</title>
     <style>
-        form  {
+        form {
             text-align: center;
             position: relative;
             top: 50px;
             padding-bottom: 30px;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+        }
     </style>
 </head>
 
 <body>
+
     <form method="post" onSubmit="validate(event)" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" >
-        <label>Email
+        <h4 style="text-align:center;">Sign Up</h4>
+        <label>Email</label>
             <input type="email" name="user_email" id="user_email" required/><br><br>
-        </label>
-        <label>Password
+        <label>Password</label>
             <input type="password" name="password" id="password" maxlength="16" required/><br><br>
-        </label>
-        <label>Confirm Password
+        <label>Confirm Password</label>
             <input type="password" name="confirm_password" id="confirm_password" maxlength="16" required /><br><br>
-        </label>
-        <span><?php echo $message ?></span><br>
-        <span id="mismatched"></span>
-        <button type="submit" target="self">Sign Up</button><br><br>
+        <span><?php echo $message ?></span><br><br>
+        <span id="mismatched"></span><br>
+        <button type="submit" target="self"><?php echo $email_status?></button><br><br>
         <a href="signIn.php" target="_top">Already have an account?</a><br>
     </form>
 
