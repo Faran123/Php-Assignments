@@ -38,7 +38,6 @@ function displayUsers($result)
         $usersArray = array(
             "email" => $data["email"],
             "status" => $data["status"],
-            "activation code" => $data["activation_code"],
             "user type" => $data["user_type"],
         );
         array_push($users["body"], $usersArray);
