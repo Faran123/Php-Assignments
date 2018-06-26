@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: coeus-sol
- * Date: 6/25/18
- * Time: 3:35 AM
- */
 ?>
 
 <html>

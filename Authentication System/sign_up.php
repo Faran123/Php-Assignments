@@ -3,15 +3,21 @@
  * Main page file
  */
 
-include "dbConnection.php";
+include "db_connection.php";
+include "helper_functions.php";
 $message = "";
 $email_status = "Sign Up";
+const ACTIVATION_LINK = "<a target='_blank' href='http://localhost:1234/php/Assignments/Authentication%20System/" ;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_email = testInput($_POST["user_email"]);
     $password = testInput($_POST["password"]);
     $confirm_password = testInput($_POST["confirm_password"]);
-    $activation_code = md5(rand(0, 1000));
-    $message = insertData($connection, $user_email, $password, $activation_code);
+    if ($password !=$confirm_password) {
+        $message = "Password mismatched";
+    } else {
+        $activation_code = activationCodeGenerator();
+        $message = insertData($connection, $user_email, $password, $activation_code, $email_status);
+    }
 }
 /**
  * This method inserts user details in db and then send call email method
@@ -27,18 +33,13 @@ function insertData($connection, $user_email, $password, $activation_code)
         $result = $connection->query("INSERT INTO users(email, password, activation_code, status, user_type)".
             "VALUES('$user_email', '$password', '$activation_code', '0', 'normal_user')");
         if ($result == false) {
-            if (mysqli_errno($connection) == 1062) {
-                throw new Exception("Email already exists");
-            } else {
-                throw new Exception("Something went wrong entering the data in database!");
-            }
+            $exception = performMoreValidations($connection);
+            throw new Exception($exception);
         } else {
             $connection->close();
-            $email_status = "Processing...";
             $status = sendAnEmail($user_email, $activation_code);
             if ($status) {
-                $message = "An activation link has been shared with you. Kindly check your inbox!";
-                $email_status = "Sign Up";
+                $message = "An activation link has been shared with you. Kindly check your mail inbox!";
                 return $message;
             }
         }
@@ -49,6 +50,21 @@ function insertData($connection, $user_email, $password, $activation_code)
     }
 }
 
+/**
+ * This method checks for exceptions like duplicate entries
+ * @param Object $connection
+ * @return string
+ */
+function performMoreValidations($connection)
+{
+    if (mysqli_errno($connection) == 1062) {
+        $exception = "Email already exists";
+    } else {
+        $exception = exceptionMessage("Data is not entered in database!");
+    }
+    return $exception;
+
+}
 
 /**
  * Send an activation code to user email address
@@ -61,9 +77,8 @@ function sendAnEmail($user_email, $activation_code)
     try {
         $to = $user_email;
         $subject = "Account Activation Link";
-        $body = "Click on the link to complete sign up process " . "<a target='_blank' " .
-            "href='http://localhost:1234/php/Assignments/Authentication%20System/" .
-            "verify.php?code=$activation_code&email=$user_email'>$activation_code
+        $body = "Click on the link to complete sign up process " . ACTIVATION_LINK .
+            "user_verify.php?code=$activation_code&email=$user_email'>$activation_code;
     </a>";
         $header = "From:abc@example.com \r\n";
         $header .= "Content-type: text/html\r\n";
@@ -75,16 +90,15 @@ function sendAnEmail($user_email, $activation_code)
 }
 
 /**
- * This method performs validation checks on user input
- * @param string $data
+ * This method generates activation code that need to be sent on user email address
  * @return string
  */
-function testInput($data)
+function activationCodeGenerator()
 {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
+     $act_code_32_characters = md5(rand(0, 1000));
+     $act_code_another_32_characters = md5(rand(0, 1000));
+     $activation_code = substr($act_code_32_characters."".$act_code_another_32_characters, 0, 60);
+     return $activation_code;
 }
 
 ?>
@@ -119,23 +133,10 @@ function testInput($data)
             <input type="password" name="confirm_password" id="confirm_password" maxlength="16" required /><br><br>
         <span><?php echo $message ?></span><br><br>
         <span id="mismatched"></span><br>
-        <button type="submit" target="self"><?php echo $email_status?></button><br><br>
-        <a href="signIn.php" target="_top">Already have an account?</a><br>
+        <button type="submit" target="self"><?php echo $email_status ?></button><br><br>
+        <a href="sign_in.php" target="_top">Already have an account?</a><br>
     </form>
-
+<script src="validate.js"></script>
 </body>
 
 </html>
-<script>
-    function validate(e) {
-        var password = document.getElementById("password").value;
-        var confirm_password = document.getElementById("confirm_password").value;
-        if (password != confirm_password) {
-            e.preventDefault(true);
-            document.getElementById("mismatched").innerHTML = "Password mismatched";
-        } else {
-            return false;
-        }
-    }
-
-</script>

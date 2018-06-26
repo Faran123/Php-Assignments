@@ -1,17 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: coeus-sol
- * Date: 6/25/18
- * Time: 4:10 AM
- */
-include "dbConnection.php";
+include "db_connection.php";
 $email = $_GET["email"];
 try {
     $result = $connection->query("SELECT status, email from users WHERE email !='$email'");
     if ($result == false) {
-        echo mysqli_error($connection);
-        throw new Exception("Something went wrong!");
+        throw new Exception(exceptionMessage("Unable to get user details!"));
     }
 } catch (Exception $exception) {
     echo $exception->getMessage();

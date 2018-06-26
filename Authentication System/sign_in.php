@@ -1,11 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: coeus-sol
- * Date: 6/22/18
- * Time: 12:04 AM
- */
-include "dbConnection.php";
+include "db_connection.php";
+include "helper_functions.php";
 $message = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = testInput($_POST["user_email"]);
@@ -14,20 +9,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = $connection->query("SELECT user_type, status from users where email='$email'".
             "and password='$password'");
         if ($result == false) {
-            throw new Exception("Something went wrong.");
+            throw new Exception(exceptionMessage("User is not logged in!"));
         } else {
             if ($result->num_rows > 0) {
-                while ($data = $result->fetch_assoc()) {
-                    if ($data["status"] == 0) {
-                        $message = "Status: <b>Inactive</b><br>";
-                    } else if ($data["status"] == 1) {
-                        if ($data["user_type"] == "normal_user") {
-                            welcomePage($email);
-                        } else if ($data["user_type"] == "admin") {
-                            listUserDetails($email);
-                        }
-                    }
-                }
+                $message = userStatus($result, $email);
             } else {
                 $message = "Please provide valid email address or password. <br>";
             }
@@ -38,13 +23,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 }
+
+/**
+ * This method checks user status whether normal or admin user
+ * @param $result
+ * @param $email
+ * @return string
+ */
+function userStatus($result, $email)
+{
+    while ($data = $result->fetch_assoc()) {
+        if ($data["status"] == 0) {
+            $message = "Status: <b>Inactive</b><br>";
+            return $message;
+        } else if ($data["status"] == 1) {
+            if ($data["user_type"] == "normal_user") {
+                welcomePage($email);
+            } else if ($data["user_type"] == "admin") {
+                listUserDetails($email);
+            }
+        }
+    }
+}
 /**
  * Welcome page
  * @param string $email
  */
 function welcomePage($email)
 {
-    header("Location: welcomePage.php?email=$email");
+    header("Location: welcome_page.php?email=$email");
 }
 
 /**
@@ -53,19 +60,7 @@ function welcomePage($email)
  */
 function listUserDetails($email)
 {
-    header("Location: userDetails.php?email=$email");
-}
-/**
- * This method performs validation checks on user input
- * @param string $data
- * @return string
- */
-function testInput($data)
-{
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
+    header("Location: user_details.php?email=$email");
 }
 ?>
 <html>

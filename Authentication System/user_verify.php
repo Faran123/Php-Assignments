@@ -1,17 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: coeus-sol
- * Date: 6/22/18
- * Time: 4:01 AM
- */
-include "dbConnection.php";
+include "db_connection.php";
+include "helper_functions.php";
 $email = $_GET["email"];
+$activation_code = $_GET["code"];
 $activate = "";
 try {
-    $result = $connection->query("UPDATE users SET status='1' WHERE email='$email'");
+    $result = $connection->query("UPDATE users SET status='1' WHERE email='$email' and activation_code='$activation_code'");
     if ($result == false) {
-        throw new Exception("Something went wrong while activating the user! ");
+        throw new Exception(exceptionMessage("The user is not activated yet!"));
     } else {
             $activate = "User activation successful!";
     }
@@ -24,7 +20,7 @@ try {
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="2;URL=signIn.php" />
+    <meta http-equiv="refresh" content="2;URL=sign_in.php" />
     <title>User Verification</title>
 </head>
 <body>
