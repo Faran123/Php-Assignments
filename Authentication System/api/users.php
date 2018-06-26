@@ -10,13 +10,13 @@ retrieveUsers($connection);
 function retrieveUsers($connection)
 {
     try {
-        $result = $connection->query("SELECT email, status, activation_code, user_type from users");
+        $result = $connection->query("SELECT email, status, user_type from users");
         if ($result == false) {
             throw new Exception(exceptionMessage(""));
         } else {
             if ($result->num_rows > 0) {
-                $usersArray = displayUsers($result);
-                echo $usersArray;
+                $users_array = displayUsers($result);
+                echo $users_array;
             } else {
                 echo "User not found!";
             }
@@ -33,14 +33,14 @@ function retrieveUsers($connection)
  */
 function displayUsers($result)
 {
-    $users["body"] = array();
+    $users['data'] = array();
     while ($data = $result->fetch_assoc()) {
-        $usersArray = array(
-            "email" => $data["email"],
-            "status" => $data["status"],
-            "user type" => $data["user_type"],
+        $users_array = array(
+            'email' => $data['email'],
+            'status' => $data['status'],
+            'user type' => $data['user_type'],
         );
-        array_push($users["body"], $usersArray);
+        array_push($users['data'], $users_array);
     }
     return json_encode($users);
 }

@@ -1,4 +1,7 @@
 <?php
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 'On');
+ini_set('display_startup_errors', 'On');
 /**
  * Main page file
  */
@@ -36,12 +39,15 @@ function insertData($connection, $user_email, $password, $activation_code)
             $exception = performMoreValidations($connection);
             throw new Exception($exception);
         } else {
-            $connection->close();
             $status = sendAnEmail($user_email, $activation_code);
             if ($status) {
+                $connection->close();
                 $message = "An activation link has been shared with you. Kindly check your mail inbox!";
                 return $message;
+            } else {
+                throw new Exception(exceptionMessage("Email can't be sent!"));
             }
+
         }
     } catch (Exception $exception) {
         $connection->close();
@@ -80,8 +86,9 @@ function sendAnEmail($user_email, $activation_code)
         $body = "Click on the link to complete sign up process " . ACTIVATION_LINK .
             "user_verify.php?code=$activation_code&email=$user_email'>$activation_code;
     </a>";
-        $header = "From:abc@example.com \r\n";
+        $header = "From:faran@yahoo.com \r\n";
         $header .= "Content-type: text/html\r\n";
+//        ini_set("sendmail_from", $header);
         $status = mail($to, $subject, $body, $header);
         return $status;
     } catch (Exception $exception) {

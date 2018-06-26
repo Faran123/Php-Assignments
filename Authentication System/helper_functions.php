@@ -12,7 +12,12 @@ function testInput($data)
     $data = htmlspecialchars($data);
     return $data;
 }
-function exceptionMessage($message)
+
+/**
+ * @param string $message
+ * @return string
+ */
+function exceptionMessage($message = "")
 {
     return "Something went wrong. ".$message;
 }
