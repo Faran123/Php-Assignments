@@ -1,11 +1,8 @@
 <?php
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 'On');
-ini_set('display_startup_errors', 'On');
 /**
  * Main page file
  */
-
+ 
 include "db_connection.php";
 include "helper_functions.php";
 $message = "";
@@ -88,7 +85,6 @@ function sendAnEmail($user_email, $activation_code)
     </a>";
         $header = "From:faran@yahoo.com \r\n";
         $header .= "Content-type: text/html\r\n";
-//        ini_set("sendmail_from", $header);
         $status = mail($to, $subject, $body, $header);
         return $status;
     } catch (Exception $exception) {
