@@ -2,7 +2,7 @@
 /**
  * Main page file
  */
- 
+
 include "db_connection.php";
 include "helper_functions.php";
 $message = "";
